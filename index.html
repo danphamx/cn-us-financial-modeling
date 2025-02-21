@@ -4,203 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>China Cities Cost Comparison</title>
-    <!-- Updated React and ReactDOM versions -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <!-- Updated Recharts CDN -->
-    <script src="https://unpkg.com/recharts@2.12.0/umd/Recharts.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <!-- Load dependencies in the correct order -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+    <script crossorigin src="https://unpkg.com/recharts@2.10.3/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Add some basic styling -->
+    <style>
+        .recharts-wrapper {
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        // Destructure from window.Recharts instead of Recharts
-        const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } = window.Recharts;
+        // First verify that we have access to Recharts
+        console.log('Recharts available:', !!Recharts);
+        
+        const {
+            BarChart,
+            Bar,
+            XAxis,
+            YAxis,
+            CartesianGrid,
+            Tooltip,
+            Legend,
+            ResponsiveContainer,
+            ReferenceLine
+        } = Recharts;
 
-        // Rest of your code remains the same
-        function App() {
-            const totalData = [
+        function SimpleCostDisplay() {
+            const data = [
                 {
                     name: 'Tier 1',
-                    min: 8796,
-                    max: 10336,
-                    range: 10336 - 8796,
+                    value: 10336,
                     usHousing: 5416,
-                    localCosts: 10336 - 5416,
+                    localCosts: 4920
                 },
                 {
                     name: 'Tier 2',
-                    min: 7306,
-                    max: 8446,
-                    range: 8446 - 7306,
+                    value: 8446,
                     usHousing: 5416,
-                    localCosts: 8446 - 5416,
+                    localCosts: 3030
                 },
                 {
                     name: 'Tier 3',
-                    min: 6881,
-                    max: 7861,
-                    range: 7861 - 6881,
+                    value: 7861,
                     usHousing: 5416,
-                    localCosts: 7861 - 5416,
+                    localCosts: 2445
                 },
                 {
                     name: 'Zhengzhou',
-                    min: 7186,
-                    max: 8166,
-                    range: 8166 - 7186,
+                    value: 8166,
                     usHousing: 5416,
-                    localCosts: 8166 - 5416,
+                    localCosts: 2750
                 }
             ];
-
-            const breakdownData = [
-                {
-                    name: 'Tier 1',
-                    'Housing (City Center)': 2500,
-                    'Utilities & Internet': 220,
-                    'Transportation': 250,
-                    'Groceries': 600,
-                    'Dining Out': 800,
-                    'Healthcare': 200,
-                    'Entertainment': 500,
-                    'US Housing': 5416,
-                },
-                {
-                    name: 'Tier 2',
-                    'Housing (City Center)': 1200,
-                    'Utilities & Internet': 180,
-                    'Transportation': 180,
-                    'Groceries': 450,
-                    'Dining Out': 500,
-                    'Healthcare': 150,
-                    'Entertainment': 400,
-                    'US Housing': 5416,
-                },
-                {
-                    name: 'Tier 3',
-                    'Housing (City Center)': 700,
-                    'Utilities & Internet': 150,
-                    'Transportation': 125,
-                    'Groceries': 350,
-                    'Dining Out': 400,
-                    'Healthcare': 120,
-                    'Entertainment': 300,
-                    'US Housing': 5416,
-                },
-                {
-                    name: 'Zhengzhou',
-                    'Housing (City Center)': 900,
-                    'Utilities & Internet': 165,
-                    'Transportation': 155,
-                    'Groceries': 400,
-                    'Dining Out': 450,
-                    'Healthcare': 130,
-                    'Entertainment': 350,
-                    'US Housing': 5416,
-                }
-            ];
-
-            const colors = {
-                'Housing (City Center)': '#8884d8',
-                'Utilities & Internet': '#82ca9d',
-                'Transportation': '#ffc658',
-                'Groceries': '#ff8042',
-                'Dining Out': '#a4de6c',
-                'Healthcare': '#d0ed57',
-                'Entertainment': '#83a6ed',
-                'US Housing': '#b5b5b5'
-            };
 
             const formatCurrency = (value) => {
                 return `$${value.toLocaleString()}`;
             };
 
-            const CustomTooltip = ({ active, payload, label }) => {
-                if (active && payload && payload.length) {
-                    const total = payload.reduce((sum, entry) => sum + entry.value, 0);
-                    return (
-                        <div className="bg-white p-4 border border-gray-200 rounded shadow">
-                            <p className="font-bold mb-2">{label}</p>
-                            {payload.map((entry, index) => (
-                                <p key={index} className="text-sm" style={{ color: entry.color }}>
-                                    {entry.name}: {formatCurrency(entry.value)}
-                                </p>
-                            ))}
-                            <div className="border-t mt-2 pt-2">
-                                <p className="font-bold">Total: {formatCurrency(total)}</p>
-                            </div>
-                        </div>
-                    );
-                }
-                return null;
-            };
-
-            const TotalCostTooltip = ({ active, payload, label }) => {
-                if (active && payload && payload.length) {
-                    return (
-                        <div className="bg-white p-4 border border-gray-200 rounded shadow">
-                            <p className="font-bold">{label}</p>
-                            <p className="text-sm">Range: {formatCurrency(payload[0].payload.min)} - {formatCurrency(payload[0].payload.max)}</p>
-                            <p className="text-sm">US Housing: {formatCurrency(payload[0].payload.usHousing)}</p>
-                            <p className="text-sm">Local Costs: {formatCurrency(payload[0].payload.localCosts)}</p>
-                        </div>
-                    );
-                }
-                return null;
-            };
-
             return (
                 <div className="container mx-auto px-4 py-8">
                     <h1 className="text-3xl font-bold mb-8">China Cities Cost Comparison</h1>
-                    
-                    <div className="space-y-12">
-                        <div className="w-full h-96">
-                            <h2 className="text-xl font-bold mb-4">Monthly Cost of Living Comparison (USD)</h2>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={totalData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" />
-                                    <YAxis tickFormatter={formatCurrency} />
-                                    <Tooltip content={<TotalCostTooltip />} />
-                                    <Legend />
-                                    <Bar dataKey="localCosts" stackId="a" fill="#82ca9d" name="Local Costs" />
-                                    <Bar dataKey="usHousing" stackId="a" fill="#8884d8" name="US Housing" />
-                                    <ReferenceLine y={5416} stroke="#8884d8" strokeDasharray="3 3" label="US Housing Cost" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-
-                        <div className="w-full h-96">
-                            <h2 className="text-xl font-bold mb-4">Monthly Cost Breakdown by City Tier (USD)</h2>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={breakdownData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="name" />
-                                    <YAxis tickFormatter={formatCurrency} />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Legend />
-                                    {Object.keys(colors).map((key) => (
-                                        <Bar key={key} dataKey={key} stackId="a" fill={colors[key]} />
-                                    ))}
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-
-                        <div className="text-sm text-gray-600 space-y-1">
-                            <p>* Values shown are maximum costs in each category</p>
-                            <p>* Hover over bars to see detailed cost breakdowns</p>
-                            <p>* US Housing cost ($5,416) is included in gray at the top of each bar</p>
-                        </div>
+                    <div className="w-full" style={{ height: "400px" }}>
+                        <ResponsiveContainer>
+                            <BarChart data={data}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis tickFormatter={formatCurrency} />
+                                <Tooltip formatter={formatCurrency} />
+                                <Legend />
+                                <Bar dataKey="localCosts" stackId="a" fill="#82ca9d" name="Local Costs" />
+                                <Bar dataKey="usHousing" stackId="a" fill="#8884d8" name="US Housing" />
+                                <ReferenceLine y={5416} stroke="#8884d8" strokeDasharray="3 3" label="US Housing Cost" />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                    <div className="mt-4 text-sm text-gray-600">
+                        <p>* US Housing cost ($5,416) is included in total</p>
+                        <p>* All values shown are maximum monthly costs</p>
                     </div>
                 </div>
             );
         }
 
+        // Render the app
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(<SimpleCostDisplay />);
     </script>
 </body>
 </html>
